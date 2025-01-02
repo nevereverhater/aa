@@ -5,7 +5,7 @@ local LocalPlayer = game:GetService("Players").LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 local HttpService = game:GetService("HttpService")
 
-local KanistayLib = {
+local OrionLib = {
     Elements = {},
     ThemeObjects = {},
     Connections = {},
@@ -41,7 +41,7 @@ local Success, Response =
 )
 
 if not Success then
-    warn("\nKanistay Library - Failed to load Feather Icons. Error code: " .. Response .. "\n")
+    warn("\nOrion Library - Failed to load Feather Icons. Error code: " .. Response .. "\n")
 end
 
 local function GetIcon(IconName)
@@ -52,53 +52,53 @@ local function GetIcon(IconName)
     end
 end
 
-local Kanistay = Instance.new("ScreenGui")
-Kanistay.Name = "Kanistay"
+local Orion = Instance.new("ScreenGui")
+Orion.Name = "Orion"
 if syn then
-    syn.protect_gui(Kanistay)
-    Kanistay.Parent = game.CoreGui
+    syn.protect_gui(Orion)
+    Orion.Parent = game.CoreGui
 else
-    Kanistay.Parent = gethui() or game.CoreGui
+    Orion.Parent = gethui() or game.CoreGui
 end
 
 if gethui then
     for _, Interface in ipairs(gethui():GetChildren()) do
-        if Interface.Name == Kanistay.Name and Interface ~= Kanistay then
+        if Interface.Name == Orion.Name and Interface ~= Orion then
             Interface:Destroy()
         end
     end
 else
     for _, Interface in ipairs(game.CoreGui:GetChildren()) do
-        if Interface.Name == Kanistay.Name and Interface ~= Kanistay then
+        if Interface.Name == Orion.Name and Interface ~= Orion then
             Interface:Destroy()
         end
     end
 end
 
-function KanistayLib:IsRunning()
+function OrionLib:IsRunning()
     if gethui then
-        return Kanistay.Parent == gethui()
+        return Orion.Parent == gethui()
     else
-        return Kanistay.Parent == game:GetService("CoreGui")
+        return Orion.Parent == game:GetService("CoreGui")
     end
 end
 
 local function AddConnection(Signal, Function)
-    if (not KanistayLib:IsRunning()) then
+    if (not OrionLib:IsRunning()) then
         return
     end
     local SignalConnect = Signal:Connect(Function)
-    table.insert(KanistayLib.Connections, SignalConnect)
+    table.insert(OrionLib.Connections, SignalConnect)
     return SignalConnect
 end
 
 task.spawn(
     function()
-        while (KanistayLib:IsRunning()) do
+        while (OrionLib:IsRunning()) do
             wait()
         end
 
-        for _, Connection in next, KanistayLib.Connections do
+        for _, Connection in next, OrionLib.Connections do
             Connection:Disconnect()
         end
     end
@@ -175,13 +175,13 @@ local function Create(Name, Properties, Children)
 end
 
 local function CreateElement(ElementName, ElementFunction)
-    KanistayLib.Elements[ElementName] = function(...)
+    OrionLib.Elements[ElementName] = function(...)
         return ElementFunction(...)
     end
 end
 
 local function MakeElement(ElementName, ...)
-    local NewElement = KanistayLib.Elements[ElementName](...)
+    local NewElement = OrionLib.Elements[ElementName](...)
     return NewElement
 end
 
@@ -232,18 +232,18 @@ local function ReturnProperty(Object)
 end
 
 local function AddThemeObject(Object, Type)
-    if not KanistayLib.ThemeObjects[Type] then
-        KanistayLib.ThemeObjects[Type] = {}
+    if not OrionLib.ThemeObjects[Type] then
+        OrionLib.ThemeObjects[Type] = {}
     end
-    table.insert(KanistayLib.ThemeObjects[Type], Object)
-    Object[ReturnProperty(Object)] = KanistayLib.Themes[KanistayLib.SelectedTheme][Type]
+    table.insert(OrionLib.ThemeObjects[Type], Object)
+    Object[ReturnProperty(Object)] = OrionLib.Themes[OrionLib.SelectedTheme][Type]
     return Object
 end
 
 local function SetTheme()
-    for Name, Type in pairs(KanistayLib.ThemeObjects) do
+    for Name, Type in pairs(OrionLib.ThemeObjects) do
         for _, Object in pairs(Type) do
-            Object[ReturnProperty(Object)] = KanistayLib.Themes[KanistayLib.SelectedTheme][Name]
+            Object[ReturnProperty(Object)] = OrionLib.Themes[OrionLib.SelectedTheme][Name]
         end
     end
 end
@@ -261,18 +261,18 @@ local function LoadCfg(Config)
     table.foreach(
         Data,
         function(a, b)
-            if KanistayLib.Flags[a] then
+            if OrionLib.Flags[a] then
                 spawn(
                     function()
-                        if KanistayLib.Flags[a].Type == "Colorpicker" then
-                            KanistayLib.Flags[a]:Set(UnpackColor(b))
+                        if OrionLib.Flags[a].Type == "Colorpicker" then
+                            OrionLib.Flags[a]:Set(UnpackColor(b))
                         else
-                            KanistayLib.Flags[a]:Set(b)
+                            OrionLib.Flags[a]:Set(b)
                         end
                     end
                 )
             else
-                warn("Kanistay Library Config Loader - Could not find ", a, b)
+                warn("Orion Library Config Loader - Could not find ", a, b)
             end
         end
     )
@@ -280,7 +280,7 @@ end
 
 local function SaveCfg(Name)
     local Data = {}
-    for i, v in pairs(KanistayLib.Flags) do
+    for i, v in pairs(OrionLib.Flags) do
         if v.Save then
             if v.Type == "Colorpicker" then
                 Data[i] = PackColor(v.Value)
@@ -289,7 +289,7 @@ local function SaveCfg(Name)
             end
         end
     end
-    writefile(KanistayLib.Folder .. "/" .. Name .. ".txt", tostring(HttpService:JSONEncode(Data)))
+    writefile(OrionLib.Folder .. "/" .. Name .. ".txt", tostring(HttpService:JSONEncode(Data)))
 end
 
 local WhitelistedMouse = {
@@ -548,11 +548,11 @@ local NotificationHolder =
         Position = UDim2.new(1, -25, 1, -25),
         Size = UDim2.new(0, 300, 1, -25),
         AnchorPoint = Vector2.new(1, 1),
-        Parent = Kanistay
+        Parent = Orion
     }
 )
 
-function KanistayLib:MakeNotification(NotificationConfig)
+function OrionLib:MakeNotification(NotificationConfig)
     spawn(
         function()
             NotificationConfig.Name = NotificationConfig.Name or "Notification"
@@ -659,13 +659,13 @@ function KanistayLib:MakeNotification(NotificationConfig)
     )
 end
 
-function KanistayLib:Init()
-    if KanistayLib.SaveCfg then
+function OrionLib:Init()
+    if OrionLib.SaveCfg then
         pcall(
             function()
-                if isfile(KanistayLib.Folder .. "/" .. game.GameId .. ".txt") then
-                    LoadCfg(readfile(KanistayLib.Folder .. "/" .. game.GameId .. ".txt"))
-                    KanistayLib:MakeNotification(
+                if isfile(OrionLib.Folder .. "/" .. game.GameId .. ".txt") then
+                    LoadCfg(readfile(OrionLib.Folder .. "/" .. game.GameId .. ".txt"))
+                    OrionLib:MakeNotification(
                         {
                             Name = "Configuration",
                             Content = "Auto-loaded configuration for the game " .. game.GameId .. ".",
@@ -678,28 +678,28 @@ function KanistayLib:Init()
     end
 end
 
-function KanistayLib:MakeWindow(WindowConfig)
+function OrionLib:MakeWindow(WindowConfig)
     local FirstTab = true
     local Minimized = false
     local Loaded = false
     local UIHidden = false
 
     WindowConfig = WindowConfig or {}
-    WindowConfig.Name = WindowConfig.Name or "Kanistay Library"
+    WindowConfig.Name = WindowConfig.Name or "Orion Library"
     WindowConfig.ConfigFolder = WindowConfig.ConfigFolder or WindowConfig.Name
     WindowConfig.SaveConfig = WindowConfig.SaveConfig or false
     WindowConfig.HidePremium = WindowConfig.HidePremium or false
     if WindowConfig.IntroEnabled == nil then
         WindowConfig.IntroEnabled = true
     end
-    WindowConfig.IntroText = WindowConfig.IntroText or "Kanistay Library"
+    WindowConfig.IntroText = WindowConfig.IntroText or "Orion Library"
     WindowConfig.CloseCallback = WindowConfig.CloseCallback or function()
         end
     WindowConfig.ShowIcon = WindowConfig.ShowIcon or false
     WindowConfig.Icon = WindowConfig.Icon or "rbxassetid://8834748103"
     WindowConfig.IntroIcon = WindowConfig.IntroIcon or "rbxassetid://8834748103"
-    KanistayLib.Folder = WindowConfig.ConfigFolder
-    KanistayLib.SaveCfg = WindowConfig.SaveConfig
+    OrionLib.Folder = WindowConfig.ConfigFolder
+    OrionLib.SaveCfg = WindowConfig.SaveConfig
 
     if WindowConfig.SaveConfig then
         if not isfolder(WindowConfig.ConfigFolder) then
@@ -898,7 +898,7 @@ function KanistayLib:MakeWindow(WindowConfig)
                         ),
                         AddThemeObject(
                             SetProps(
-                                MakeElement("Label", Kanistay, WindowConfig.HidePremium and 14 or 13),
+                                MakeElement("Label", LocalPlayer.DisplayName, WindowConfig.HidePremium and 14 or 13),
                                 {
                                     Size = UDim2.new(1, -60, 0, 13),
                                     Position = WindowConfig.HidePremium and UDim2.new(0, 50, 0, 19) or
@@ -959,7 +959,7 @@ function KanistayLib:MakeWindow(WindowConfig)
             SetProps(
                 MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 10),
                 {
-                    Parent = Kanistay,
+                    Parent = Orion,
                     Position = UDim2.new(0.5, -307, 0.5, -172),
                     Size = UDim2.new(0, 615, 0, 344),
                     ClipsDescendants = true
@@ -1040,7 +1040,7 @@ function KanistayLib:MakeWindow(WindowConfig)
         function()
             MainWindow.Visible = false
             UIHidden = true
-            KanistayLib:MakeNotification(
+            OrionLib:MakeNotification(
                 {
                     Name = "Interface Hidden",
                     Content = "Tap RightShift to reopen the interface",
@@ -1097,7 +1097,7 @@ function KanistayLib:MakeWindow(WindowConfig)
             SetProps(
             MakeElement("Image", WindowConfig.IntroIcon),
             {
-                Parent = Kanistay,
+                Parent = Orion,
                 AnchorPoint = Vector2.new(0.5, 0.5),
                 Position = UDim2.new(0.5, 0, 0.4, 0),
                 Size = UDim2.new(0, 28, 0, 28),
@@ -1110,7 +1110,7 @@ function KanistayLib:MakeWindow(WindowConfig)
             SetProps(
             MakeElement("Label", WindowConfig.IntroText, 14),
             {
-                Parent = Kanistay,
+                Parent = Orion,
                 Size = UDim2.new(1, 0, 1, 0),
                 AnchorPoint = Vector2.new(0.5, 0.5),
                 Position = UDim2.new(0.5, 19, 0.5, 0),
@@ -1443,9 +1443,9 @@ function KanistayLib:MakeWindow(WindowConfig)
                             TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
                             {
                                 BackgroundColor3 = Color3.fromRGB(
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.R * 255 + 3,
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.G * 255 + 3,
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.B * 255 + 3
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.R * 255 + 3,
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.G * 255 + 3,
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.B * 255 + 3
                                 )
                             }
                         ):Play()
@@ -1458,7 +1458,7 @@ function KanistayLib:MakeWindow(WindowConfig)
                         TweenService:Create(
                             ButtonFrame,
                             TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
-                            {BackgroundColor3 = KanistayLib.Themes[KanistayLib.SelectedTheme].Second}
+                            {BackgroundColor3 = OrionLib.Themes[OrionLib.SelectedTheme].Second}
                         ):Play()
                     end
                 )
@@ -1471,9 +1471,9 @@ function KanistayLib:MakeWindow(WindowConfig)
                             TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
                             {
                                 BackgroundColor3 = Color3.fromRGB(
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.R * 255 + 3,
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.G * 255 + 3,
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.B * 255 + 3
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.R * 255 + 3,
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.G * 255 + 3,
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.B * 255 + 3
                                 )
                             }
                         ):Play()
@@ -1493,9 +1493,9 @@ function KanistayLib:MakeWindow(WindowConfig)
                             TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
                             {
                                 BackgroundColor3 = Color3.fromRGB(
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.R * 255 + 6,
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.G * 255 + 6,
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.B * 255 + 6
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.R * 255 + 6,
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.G * 255 + 6,
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.B * 255 + 6
                                 )
                             }
                         ):Play()
@@ -1596,12 +1596,12 @@ function KanistayLib:MakeWindow(WindowConfig)
                     TweenService:Create(
                         ToggleBox,
                         TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
-                        {BackgroundColor3 = Toggle.Value and ToggleConfig.Color or KanistayLib.Themes.Default.Divider}
+                        {BackgroundColor3 = Toggle.Value and ToggleConfig.Color or OrionLib.Themes.Default.Divider}
                     ):Play()
                     TweenService:Create(
                         ToggleBox.Stroke,
                         TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
-                        {Color = Toggle.Value and ToggleConfig.Color or KanistayLib.Themes.Default.Stroke}
+                        {Color = Toggle.Value and ToggleConfig.Color or OrionLib.Themes.Default.Stroke}
                     ):Play()
                     TweenService:Create(
                         ToggleBox.Ico,
@@ -1624,9 +1624,9 @@ function KanistayLib:MakeWindow(WindowConfig)
                             TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
                             {
                                 BackgroundColor3 = Color3.fromRGB(
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.R * 255 + 3,
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.G * 255 + 3,
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.B * 255 + 3
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.R * 255 + 3,
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.G * 255 + 3,
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.B * 255 + 3
                                 )
                             }
                         ):Play()
@@ -1639,7 +1639,7 @@ function KanistayLib:MakeWindow(WindowConfig)
                         TweenService:Create(
                             ToggleFrame,
                             TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
-                            {BackgroundColor3 = KanistayLib.Themes[KanistayLib.SelectedTheme].Second}
+                            {BackgroundColor3 = OrionLib.Themes[OrionLib.SelectedTheme].Second}
                         ):Play()
                     end
                 )
@@ -1652,9 +1652,9 @@ function KanistayLib:MakeWindow(WindowConfig)
                             TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
                             {
                                 BackgroundColor3 = Color3.fromRGB(
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.R * 255 + 3,
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.G * 255 + 3,
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.B * 255 + 3
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.R * 255 + 3,
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.G * 255 + 3,
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.B * 255 + 3
                                 )
                             }
                         ):Play()
@@ -1671,9 +1671,9 @@ function KanistayLib:MakeWindow(WindowConfig)
                             TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
                             {
                                 BackgroundColor3 = Color3.fromRGB(
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.R * 255 + 6,
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.G * 255 + 6,
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.B * 255 + 6
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.R * 255 + 6,
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.G * 255 + 6,
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.B * 255 + 6
                                 )
                             }
                         ):Play()
@@ -1681,7 +1681,7 @@ function KanistayLib:MakeWindow(WindowConfig)
                 )
 
                 if ToggleConfig.Flag then
-                    KanistayLib.Flags[ToggleConfig.Flag] = Toggle
+                    OrionLib.Flags[ToggleConfig.Flag] = Toggle
                 end
                 return Toggle
             end
@@ -1852,7 +1852,7 @@ function KanistayLib:MakeWindow(WindowConfig)
 
                 Slider:Set(Slider.Value)
                 if SliderConfig.Flag then
-                    KanistayLib.Flags[SliderConfig.Flag] = Slider
+                    OrionLib.Flags[SliderConfig.Flag] = Slider
                 end
                 return Slider
             end
@@ -2137,7 +2137,7 @@ function KanistayLib:MakeWindow(WindowConfig)
                 Dropdown:Refresh(Dropdown.Options, false)
                 Dropdown:Set(Dropdown.Value)
                 if DropdownConfig.Flag then
-                    KanistayLib.Flags[DropdownConfig.Flag] = Dropdown
+                    OrionLib.Flags[DropdownConfig.Flag] = Dropdown
                 end
                 return Dropdown
             end
@@ -2306,9 +2306,9 @@ function KanistayLib:MakeWindow(WindowConfig)
                             TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
                             {
                                 BackgroundColor3 = Color3.fromRGB(
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.R * 255 + 3,
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.G * 255 + 3,
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.B * 255 + 3
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.R * 255 + 3,
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.G * 255 + 3,
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.B * 255 + 3
                                 )
                             }
                         ):Play()
@@ -2321,7 +2321,7 @@ function KanistayLib:MakeWindow(WindowConfig)
                         TweenService:Create(
                             BindFrame,
                             TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
-                            {BackgroundColor3 = KanistayLib.Themes[KanistayLib.SelectedTheme].Second}
+                            {BackgroundColor3 = OrionLib.Themes[OrionLib.SelectedTheme].Second}
                         ):Play()
                     end
                 )
@@ -2334,9 +2334,9 @@ function KanistayLib:MakeWindow(WindowConfig)
                             TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
                             {
                                 BackgroundColor3 = Color3.fromRGB(
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.R * 255 + 3,
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.G * 255 + 3,
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.B * 255 + 3
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.R * 255 + 3,
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.G * 255 + 3,
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.B * 255 + 3
                                 )
                             }
                         ):Play()
@@ -2351,9 +2351,9 @@ function KanistayLib:MakeWindow(WindowConfig)
                             TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
                             {
                                 BackgroundColor3 = Color3.fromRGB(
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.R * 255 + 6,
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.G * 255 + 6,
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.B * 255 + 6
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.R * 255 + 6,
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.G * 255 + 6,
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.B * 255 + 6
                                 )
                             }
                         ):Play()
@@ -2369,7 +2369,7 @@ function KanistayLib:MakeWindow(WindowConfig)
 
                 Bind:Set(BindConfig.Default)
                 if BindConfig.Flag then
-                    KanistayLib.Flags[BindConfig.Flag] = Bind
+                    OrionLib.Flags[BindConfig.Flag] = Bind
                 end
                 return Bind
             end
@@ -2490,9 +2490,9 @@ function KanistayLib:MakeWindow(WindowConfig)
                             TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
                             {
                                 BackgroundColor3 = Color3.fromRGB(
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.R * 255 + 3,
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.G * 255 + 3,
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.B * 255 + 3
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.R * 255 + 3,
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.G * 255 + 3,
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.B * 255 + 3
                                 )
                             }
                         ):Play()
@@ -2505,7 +2505,7 @@ function KanistayLib:MakeWindow(WindowConfig)
                         TweenService:Create(
                             TextboxFrame,
                             TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
-                            {BackgroundColor3 = KanistayLib.Themes[KanistayLib.SelectedTheme].Second}
+                            {BackgroundColor3 = OrionLib.Themes[OrionLib.SelectedTheme].Second}
                         ):Play()
                     end
                 )
@@ -2518,9 +2518,9 @@ function KanistayLib:MakeWindow(WindowConfig)
                             TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
                             {
                                 BackgroundColor3 = Color3.fromRGB(
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.R * 255 + 3,
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.G * 255 + 3,
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.B * 255 + 3
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.R * 255 + 3,
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.G * 255 + 3,
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.B * 255 + 3
                                 )
                             }
                         ):Play()
@@ -2536,9 +2536,9 @@ function KanistayLib:MakeWindow(WindowConfig)
                             TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
                             {
                                 BackgroundColor3 = Color3.fromRGB(
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.R * 255 + 6,
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.G * 255 + 6,
-                                    KanistayLib.Themes[KanistayLib.SelectedTheme].Second.B * 255 + 6
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.R * 255 + 6,
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.G * 255 + 6,
+                                    OrionLib.Themes[OrionLib.SelectedTheme].Second.B * 255 + 6
                                 )
                             }
                         ):Play()
@@ -2889,7 +2889,7 @@ function KanistayLib:MakeWindow(WindowConfig)
 
                 Colorpicker:Set(Colorpicker.Value)
                 if ColorpickerConfig.Flag then
-                    KanistayLib.Flags[ColorpickerConfig.Flag] = Colorpicker
+                    OrionLib.Flags[ColorpickerConfig.Flag] = Colorpicker
                 end
                 return Colorpicker
             end
@@ -3040,11 +3040,19 @@ function KanistayLib:MakeWindow(WindowConfig)
         return ElementFunction
     end
 
+    OrionLib:MakeNotification(
+        {
+            Name = "UI Library Upgrade",
+            Content = "New UI Library Available at sirius.menu/discord and sirius.menu/rayfield",
+            Time = 5
+        }
+    )
+
     return TabFunction
 end
 
-function KanistayLib:Destroy()
-    Kanistay:Destroy()
+function OrionLib:Destroy()
+    Orion:Destroy()
 end
 
-return KanistayLib
+return OrionLib
